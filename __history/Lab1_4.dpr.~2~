@@ -1,0 +1,89 @@
+Program Lab1_4;
+
+{$APPTYPE CONSOLE}
+
+{$R *.res}
+
+uses
+  System.SysUtils;
+
+Type
+    Pt = ^Elem;
+    Elem = Record
+        Data: String;
+        Next: Pt;
+        Prev: Pt;
+    End;
+
+Function IsValidAreaNumber(INumber: Integer) : Boolean;
+Const
+    MAX_SEV = 9999999;
+    MIN_SEV = 1000000;
+    MAX_TRE = 999;
+    MIN_TRE = 100;
+Begin
+    IsValidAreaNumber := (INumber >= MIN_TRE) And (INumber <= MAX_TRE) Or (INumber >= MIN_SEV) And (INumber <= MAX_SEV)
+End;
+
+Function IsValidNumber(Number: String) : Boolean;
+Var
+    INumber: Integer;
+    IsValid: Boolean;
+Begin
+    INumber := 0;
+    IsValid := True;
+    Try
+        INumber := StrToInt(Number);
+    Except
+        IsValid := False;
+    End;
+    If IsValid And Not IsValidAreaNumber(INumber) Then
+        IsValid := False;
+    If Not IsValid Then
+        WriteLn('Ваш номер ни 3-х и ни 7-и значный!');
+    IsValidNumber := IsValid;
+End;
+
+Procedure ReadNumber(ListNumbers: Pt; Var Number: Pt; IsFirst: Boolean; MessageText: String);
+Var
+    IsValid: Boolean;
+Begin
+    Repeat
+        IsValid := True;
+        Number := ListNumbers;
+        ReadLn(Number^.Data);
+        If IsFirst And (Number^.Data <> '\0') Or IsValidNumber(Number^.Data) Then
+        Begin
+            New(ListNumbers);
+            Number^.Next := ListNumbers;
+            ListNumbers^.Prev := Number;
+        End
+        Else
+        Begin
+            IsValid := False;
+            WriteLn(MessageText);
+        End;
+    Until IsValid;
+End;
+
+Procedure MakeList(Var ListNumbers: Pt);
+Var
+    Number: Pt;
+Begin
+    WriteLn('Введите 3-х или 7-ми значные номера(для выхода введите ''\0''):');
+    New(ListNumbers);
+    ListNumbers^.Prev := Nil;
+    ReadNumber(ListNumbers, Number, True, 'Вы должны ввести хотя бы один верный номер!');
+    Repeat
+        ReadNumber(ListNumbers, Number, False, 'Неверный номер!');
+    Until Number^.Data = '\0';
+    Number^.Next := Nil;
+End;
+
+Var
+    ListNumbers: Pt;
+Begin
+    MakeList(ListNumbers);
+
+    ReadLn;
+End.

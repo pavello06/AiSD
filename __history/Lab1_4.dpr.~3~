@@ -1,0 +1,111 @@
+Program Lab1_4;
+
+{$APPTYPE CONSOLE}
+
+{$R *.res}
+
+uses
+  System.SysUtils;
+
+Type
+    BiPt = ^BiElem;
+    BiElem = Record
+        Data: String;
+        Next: BiPt;
+        Prev: BiPt;
+    End;
+    UniPt = ^UniElem;
+    UniElem = Record
+        Data: String;
+        Next: UniPt;
+    End;
+
+Function IsValidNumber(Number: String) : Boolean;
+Var
+    IsValid: Boolean;
+Begin
+    IsValid := True;
+    Try
+        StrToInt(Number);
+    Except
+        IsValid := False;
+    End;
+    If IsValid And (Length(Number) <> 3) And (Length(Number) <> 7) Then
+        IsValid := False;
+    IsValidNumber := IsValid;
+End;
+
+Procedure ReadNumber(Var BiListNumbers: BiPt; Var Number: BiPt; IsFirst: Boolean; MessageText: String);
+Var
+    IsValid: Boolean;
+Begin
+    Repeat
+        IsValid := True;
+        Number := BiListNumbers;
+        ReadLn(Number^.Data);
+        If IsFirst And (Number^.Data <> '\0') And IsValidNumber(Number^.Data) Or
+           Not IsFirst And (Number^.Data = '\0') Or
+           IsValidNumber(Number^.Data) Then
+        Begin
+            New(BiListNumbers);
+            Number^.Next := BiListNumbers;
+            BiListNumbers^.Prev := Number;
+        End
+        Else
+        Begin
+            IsValid := False;
+            WriteLn(MessageText);
+        End;
+    Until IsValid;
+End;
+
+Procedure MakeBiListOfNumbers(Var BiListNumbers, LastNumber: BiPt);
+Begin
+    WriteLn('Введите 3-х или 7-ми значные номера(для выхода введите ''\0''):');
+    New(BiListNumbers);
+    BiListNumbers^.Prev := Nil;
+    ReadNumber(BiListNumbers, LastNumber, True, 'Вы должны ввести хотя бы один верный номер!');
+    Repeat
+        ReadNumber(BiListNumbers, LastNumber, False, 'Неверный номер!');
+    Until LastNumber^.Data = '\0';
+    LastNumber := LastNumber^.Prev;
+    LastNumber^.Next^.Prev := Nil;
+End;
+
+Procedure MakeUniListOfNumbers(Var UniListOfNumbers: UniPt; LastNumber: BiPt);
+Const
+    LEN_SUB_NUMBER = 7;
+Begin
+    New(UniListOfNumbers);
+    While LastNumber^.Prev <> Nil Do
+    Begin
+        If Length(LastNumber^.Data) = LEN_SUB_NUMBER Then
+        Begin
+            New(UniListOfNumbers^.Next);
+            UniListOfNumbers := UniListOfNumbers^.Next;
+            UniListOfNumbers^.Data := LastNumber^.Data
+        End;
+        LastNumber := LastNumber^.Prev;
+    End;
+    UniListOfNumbers^.Next := Nil;
+End;
+
+Procedure WriteUniListOfNumbers(UniListOfNumbers: UniPt);
+Begin
+    WriteLn('Список номеров абонентов: ');
+    While UniListOfNumbers <> Nil Do
+    Begin
+        WriteLn(UniListOfNumbers^.Data, '; ');
+        UniListOfNumbers := UniListOfNumbers^.Next;
+    End;
+End;
+
+Var
+    BiListOfNumbers, LastNumber: BiPt;
+    UniListOfNumbers: UniPt;
+Begin
+    MakeBiListOfNumbers(BiListOfNumbers, LastNumber);
+    MakeUniListOfNumbers(UniListOfNumbers, LastNumber);
+    WriteUniListOfNumbers(UniListOfNumbers);
+    ReadLn;
+End.

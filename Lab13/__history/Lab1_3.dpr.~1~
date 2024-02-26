@@ -1,0 +1,71 @@
+Program Lab1_3;
+
+{$APPTYPE CONSOLE}
+{$R *.res}
+
+Const
+    DIGITS = ['0'..'9'];
+    MIN_LENGTH_LASTNAME = 1;
+    MAX_LENGTH_LASTNAME = 20;
+    MIN_LENGTH_NUMBER = 1;
+    MAX_LENGTH_NUMBER = 20;
+
+Type
+    TLastName = String[MAX_LENGTH_LASTNAME];
+    TNumber = String[MAX_LENGTH_NUMBER];
+
+    TLinkedList = ^TPerson;
+
+    TPerson = Record
+        LastName: TLastName;
+        Number: TNumber;
+        Next: TLinkedList;
+    End;
+
+
+
+Procedure ReadPearson(Var ListOfPeople: TLinkedList; IsFirst: Boolean; MessageText: String);
+Var
+    IsValid: Boolean;
+    TempLastName: TLastName;
+    TempNymber: TNumber;
+Begin
+    Repeat
+        IsValid := True;
+        ReadLn(TempLastName);
+        If IsFirst Or Not IsFirst And (ListOfPerson.LastName <> '\0') Then
+        Begin
+            If (Length(TempLastName) >= MIN_LENGTH_LASTNAME) And (Length(TempLastName) <= MAX_LENGTH_LASTNAME) Then
+            Begin
+                New(ListOfPeople^.Next);
+                ListOfPeople := ListOfPeople^.Next;
+                ListOfPeople^.Number := I;
+            End
+            Else
+            Begin
+                IsValid := False;
+                WriteLn(MessageText);
+            End;
+        End;
+    Until IsValid;
+End;
+
+Procedure MakeBiListOfNumbers(ListOfPerson: TLinkedList);
+Var
+    TempString: String;
+Begin
+    WriteLn('Введите фамилии и номера(для прекращения введите ''\0''):');
+    ReadPerson(ListOfPerson, True, 'Вы должны ввести хотя бы одного верного человека!');
+    Repeat
+        ReadNumber(BiListOfNumbers, False, 'Неверный номер!');
+    Until BiListOfNumbers^.Data = '\0';
+    BiListOfNumbers := BiListOfNumbers^.Prev;
+    BiListOfNumbers^.Next := Nil;
+End;
+
+
+
+
+Begin
+
+End.
