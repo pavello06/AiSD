@@ -12,16 +12,16 @@
         <tr>
             <td align="center">Block1</td>
             <td align="center">
-                <a href = "https://github.com/pavello06/AiSD/blob/master/Block1/Lab11/Lab11.dpr">Delphi</a><br>
+                <a href = "https://github.com/pavello06/AiSD/blob/master/Block1/Lab11/Lab1_1.dpr">Delphi</a><br>
             </td>
             <td align="center">
-                <a href = "https://github.com/pavello06/AiSD/blob/master/Block1/Lab12/Lab12.dpr">Delphi</a><br>
+                <a href = "https://github.com/pavello06/AiSD/blob/master/Block1/Lab12/Lab1_2.dpr">Delphi</a><br>
             </td>
             <td align="center">
-                <a href = "https://github.com/pavello06/AiSD/blob/master/Block1/Lab13/Lab13.dpr">Delphi</a><br>
+                <a href = "https://github.com/pavello06/AiSD/blob/master/Block1/Lab13/Lab1_3.dpr">Delphi</a><br>
             </td>
             <td align="center">
-                <a href = "https://github.com/pavello06/AiSD/blob/master/Block1/Lab14/Lab14.dpr">Delphi</a><br>
+                <a href = "https://github.com/pavello06/AiSD/blob/master/Block1/Lab14/Lab1_4.dpr">Delphi</a><br>
             </td>
         </tr>
     </tbody>
