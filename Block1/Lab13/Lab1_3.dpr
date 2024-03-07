@@ -1,108 +1,143 @@
 Program Lab1_3;
 
-Uses
-    SysUtils;
+uses
+  System.SysUtils;
 
 Const
-    MIN_LENGTH_LASTNAME = 1;
-    MAX_LENGTH_LASTNAME = 20;
-    MIN_LENGTH_NUMBER = 1;
-    MAX_LENGTH_NUMBER = 20;
+    MIN_LENGTH_LAST_NAME = 1;
+    MAX_LENGTH_LAST_NAME = 20;
+
+    MIN_LENGTH_NUMBER = 7;
+    MAX_LENGTH_NUMBER = 7;
 
 Type
-    TLastName = String[MAX_LENGTH_LASTNAME];
+    TLastName = String[MAX_LENGTH_LAST_NAME];
     TNumber = String[MAX_LENGTH_NUMBER];
 
-    TLinkedList = ^TPerson;
-
-    TPerson = Record
+    PSubscriber = ^TSubscriber;
+    TSubscriber = Record
         LastName: TLastName;
         Number: TNumber;
-        Next: TLinkedList;
+        Next: PSubscriber;
     End;
-
 
 Function IsValidСharacteristic(Str: String; Const MIN, MAX: Integer; Condition: Boolean) : Boolean;
 Begin
     IsValidСharacteristic := (Length(Str) >= MIN) And (Length(Str) <= MAX) And Condition;
 End;
 
-Procedure ReadPerson(Var ListOfPeople: TLinkedList);
+Procedure AddSubscriber(Var Head, TempSubscriber: PSubscriber);
+Var
+    CurrSubscriber: PSubscriber;
+Begin
+    If Head = Nil Then
+        Head := TempSubscriber
+    Else
+    Begin
+        CurrSubscriber := Head;
+        While (CurrSubscriber^.Next <> Nil) And (CurrSubscriber^.Next^.LastName < TempSubscriber^.LastName) Do
+            CurrSubscriber := CurrSubscriber^.Next;
+        TempSubscriber^.Next := CurrSubscriber^.Next;
+        CurrSubscriber^.Next := TempSubscriber;
+    End;
+End;
+
+Procedure ReadSubscriber(Var Head: PSubscriber);
 Var
     IsValid: Boolean;
     TempLastName: TLastName;
     TempNumber: TNumber;
     Num: Integer;
+    TempSubscriber: PSubscriber;
 Begin
     WriteLn('Введите фамилию человека (макс 20 символов):');
     Repeat
         ReadLn(TempLastName);
-        IsValid := IsValidСharacteristic(String(TempLastName), MIN_LENGTH_LASTNAME, MAX_LENGTH_LASTNAME, True);
+        IsValid := IsValidСharacteristic(String(TempLastName), MIN_LENGTH_LAST_NAME, MAX_LENGTH_LAST_NAME, True);
         If Not IsValid Then
             WriteLn('Неверная фамилия!'#13#10'Попробуйте снова:');
     Until IsValid;
-    WriteLn('Введите номер человека (макс 20 символов):');
+    WriteLn('Введите номер человека (7 символов):');
     Repeat
         ReadLn(TempNumber);
-        IsValid := IsValidСharacteristic(String(TempLastName), MIN_LENGTH_NUMBER, MAX_LENGTH_NUMBER, TryStrToInt(String(TempNumber), Num) And (TempNumber <> '-'));
+        IsValid := IsValidСharacteristic(String(TempNumber), MIN_LENGTH_NUMBER, MAX_LENGTH_NUMBER, TryStrToInt(String(TempNumber), Num) And (TempNumber <> '-'));
         If Not IsValid Then
             WriteLn('Неверный номер!'#13#10'Попробуйте снова:');
     Until IsValid;
-    New(ListOfPeople^.Next);
-    ListOfPeople := ListOfPeople^.Next;
-    ListOfPeople.LastName := TempLastName;
-    ListOfPeople.Number := TempNumber;
+    New(TempSubscriber);
+    TempSubscriber^.LastName := TempLastName;
+    TempSubscriber^.Number := TempNumber;
+    TempSubscriber^.Next := Nil;
+    AddSubscriber(Head, TempSubscriber);
 End;
 
-Procedure MakeListOfPeople(ListOfPeople: TLinkedList);
+Procedure MakeSubscribers(Var Head: PSubscriber);
 Var
     TempString: String;
 Begin
-    ReadPerson(ListOfPeople);
+    ReadSubscriber(Head);
     Repeat
         Write('Нажмите Enter для продолжения (для прекращения введите ''\0''): ');
         ReadLn(TempString);
         If TempString <> '\0' Then
-            ReadPerson(ListOfPeople);
+            ReadSubscriber(Head);
     Until TempString = '\0';
-    ListOfPeople.Next := Nil;
+    WriteLn;
 End;
 
 
 
-Procedure SearchByСharacteristic(ListOfPeople: TLinkedList; lnMode: Char);
+Procedure PrintSubscribers(Head: PSubscriber);
+Begin
+    While Head <> Nil Do
+    Begin
+        Write('Фамилия: ', Head.LastName, #13#10);
+        Write('Номер: ', Head.Number, #13#10);
+        Head := Head.Next;
+    End;
+    WriteLn;
+End;
+
+
+
+Procedure SearchByСharacteristic(Head: PSubscriber; lnMode: Char);
 Var
     TempString: String;
     HasPerson: Boolean;
 Begin
-    WriteLn('Введите характеристику: ');
+    WriteLn;
+    If lnMode = 'l' Then
+        Write('Введите фамилию: ')
+    Else
+        Write('Введите номер: ');
     ReadLn(TempString);
     HasPerson := False;
-    While ListOfPeople <> Nil Do
+    While Head <> Nil Do
     Begin
         If lnMode = 'l' Then
         Begin
-            If String(ListOfPeople.LastName) = TempString Then
+            If String(Head.LastName) = TempString Then
             Begin
-                WriteLn('Номер: ', ListOfPeople.Number);
+                WriteLn('Номер: ', Head.Number);
                 HasPerson := True;
             End;
         End
         Else
         Begin
-            If String(ListOfPeople.Number) = TempString Then
+            If String(Head.Number) = TempString Then
             Begin
-                WriteLn('Фамилия: ', ListOfPeople.LastName);
+                WriteLn('Фамилия: ', Head.LastName);
                 HasPerson := True;
             End;
         End;
-        ListOfPeople := ListOfPeople^.Next;
+        Head := Head^.Next;
     End;
     If Not HasPerson Then
-        WriteLn('Таких людей нет(');    
+        WriteLn('Таких людей нет(');
+    WriteLn;
 End;
 
-Procedure Search(ListOfPeople: TLinkedList);
+Procedure Search(Head: PSubscriber);
 Var
     Action: Char;
 Begin
@@ -115,22 +150,23 @@ Begin
         Write('Ваш выбор: ');
         ReadLn(Action);
         Case Action Of
-            '1': SearchByСharacteristic(ListOfPeople, 'l');
-            '2': SearchByСharacteristic(ListOfPeople, 'n');
-            '3': Exit;    
+            '1': SearchByСharacteristic(Head, 'l');
+            '2': SearchByСharacteristic(Head, 'n');
+            '3': Exit;
         End;
         Write('Нажмите любую клавишу для продолжения: ');
-        Read;
+        ReadLn;
     End;
 End;
 
 
-
 Var
-    ListOfPeople: TLinkedList;
+    Head: PSubscriber;
 Begin
-    New(ListOfPeople);
-    MakeListOfPeople(ListOfPeople);
-    
-    Search(ListOfPeople);
+    Head := Nil;
+    MakeSubscribers(Head);
+
+    PrintSubscribers(Head);
+
+    Search(Head);
 End.
